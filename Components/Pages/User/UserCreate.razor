@@ -1,0 +1,112 @@
+﻿@page "/user/create"
+@using D01K14BlazorServerApp.Data
+@using MySql.Data.MySqlClient
+@inject NavigationManager NavigationManager
+
+<h3>CreateUser</h3>
+<div class="container">
+	<EditForm Model="user" OnValidSubmit="HandleCreateUser">
+		<div class="row">
+			<DataAnnotationsValidator />
+			<div class="col-6">
+				<div class="mb-3">
+					<label class="form-label">Full Name</label>
+					<InputText class="form-control" @bind-Value=user.UserFullName />
+					<ValidationMessage For="() => user.UserFullName" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Email</label>
+					<InputText class="form-control" @bind-Value=user.UserEmail />
+					<ValidationMessage For="() => user.UserEmail" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Password</label>
+					<InputText class="form-control" @bind-Value=user.UserPassword />
+					<ValidationMessage For="() => user.UserPassword" />
+				</div>
+				
+				<div class="mb-3">
+					<label class="form-label">Status</label>
+					<InputSelect @bind-Value=user.IsDeleted class="form-control">
+						<option value="0">Active</option>
+						<option value="1">Deleted</option>
+					</InputSelect>
+					<ValidationMessage For="() => user.IsDeleted" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Level</label>
+					<InputSelect @bind-Value=user.UserLevel class="form-control">
+						<option value="0">Admin</option>
+						<option value="1">Member</option>
+					</InputSelect>
+				</div>
+				<div class="mb-3">
+					<Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+				</div>
+			</div>
+			<div class="col-6">
+				<div class="mb-3">
+					<label class="form-label">File</label>
+					<InputFile class="form-control" OnChange="HandleFileSeclected"></InputFile>
+					@if(ImageDataUrl != "")
+					{
+						<img src="@ImageDataUrl" style="max-width: 500px;" />
+					}
+					
+				</div>
+			</div>
+		</div>
+	</EditForm>
+</div>
+@code {
+	User user = new User();
+	private string ImageDataUrl = "";
+	private IBrowserFile selectedFile;
+	private async void HandleCreateUser()
+	{
+		try
+		{
+			await SaveImageToServer(selectedFile);
+			string UserFullName = user.UserFullName;
+			string UserEmail = user.UserEmail;
+			string UserPassword = user.UserPassword;
+			int IsDeleted = user.IsDeleted;
+			int UserLevel = user.UserLevel;
+			string AvatarUrl = user.AvatarUrl;
+			string SqlInsertUser = $"INSERT INTO users(user_fullname, user_email, user_password, user_level, avatar_url, isDeleted) VALUES('{UserFullName}', '{UserEmail}', '{UserPassword}', '{UserLevel}', '{AvatarUrl}', '{IsDeleted}')";
+			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+			conn.Open();
+			MySqlCommand cmd = conn.CreateCommand();
+			cmd.CommandText = SqlInsertUser;
+			cmd.ExecuteNonQuery();
+			conn.Close();
+			NavigationManager.NavigateTo("user");
+		}catch(Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+	}
+
+
+	private async Task HandleFileSeclected(InputFileChangeEventArgs e)
+	{
+		selectedFile = e.File;
+		var resizeFile = await e.File.RequestImageFileAsync("image/jpeg", 500, 500);
+		var buffer = new byte[resizeFile.Size];
+		await resizeFile.OpenReadStream().ReadAsync(buffer);
+		ImageDataUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
+	}
+
+	private async Task SaveImageToServer(IBrowserFile file)
+	{
+		var FileName = file.Name;
+		var folderPath = Path.Combine("wwwroot", "uploads"); //wwwroot/uploads
+		var filePath = Path.Combine(folderPath, FileName); //wwwroot/uploads/...
+		Directory.CreateDirectory(folderPath);
+		using(var fileStream = new FileStream(filePath, FileMode.Create))
+		{
+			await file.OpenReadStream().CopyToAsync(fileStream);
+		}
+		user.AvatarUrl = $"uploads/{FileName}";
+	}
+}

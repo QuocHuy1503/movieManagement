@@ -1,0 +1,116 @@
+﻿@page "/movies/list"
+@using D01K14BlazorServerApp.Data  // Replace with your namespace
+@using MySql.Data.MySqlClient
+
+@inject NavigationManager NavigationManager
+
+<PageTitle>List of Movies</PageTitle>
+
+<h3>MovieList</h3>
+
+@if (movies == null)
+{
+  <h3>Không có dữ liệu</h3>
+}
+else
+{
+  <div class="container">
+    <div class="row">
+      <div class="col-12">
+        <Button Type="ButtonType.Link" Color="ButtonColor.Primary" Class="mb-3" To="/movies/create">Create Movie</Button>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <Grid TItem="Movie"
+              Class="table table-hover table-bordered table-striped"
+              DataProvider="MoviesDataProvider"
+              AllowFiltering="true"
+              AllowPaging="true"
+              PageSize="10"
+              AllowSorting="true"
+              Responsive="true">
+
+          <GridColumn TItem="Movie" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
+            @context.Id
+          </GridColumn>
+          <GridColumn TItem="Movie" HeaderText="Title" PropertyName="Title" SortKeySelector="item => item.Title">
+            @context.Title
+          </GridColumn>
+          <GridColumn TItem="Movie" HeaderText="Release Date" PropertyName="ReleaseDate" SortKeySelector="item => item.ReleaseDate">
+            @context.ReleaseDate.ToString("dd MMM yyyy")
+          </GridColumn>
+          <GridColumn TItem="Movie" HeaderText="Action">
+            <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=$"/movies/edit/{@context.Id}">Edit</Button>
+            <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteMovie(movieId)">Delete</Button>
+          </GridColumn>
+
+        </Grid>
+      </div>
+    </div>
+  </div>
+}
+
+@code {
+  public List<Movie> movies;
+
+  protected override void OnInitialized()
+  {
+    movies = GetMovies();
+  }
+
+  private async Task<GridDataProviderResult<Movie>> MoviesDataProvider(GridDataProviderRequest<Movie> request)
+  {
+    if (movies is null) // pull movies only once for client-side filtering, sorting, and paging
+      movies = GetMovies(); // call a service or an API to pull the movies
+
+    return await Task.FromResult(request.ApplyTo(movies));
+  }
+
+  private List<Movie> GetMovies()
+  {
+    List<Movie> list = new List<Movie>();
+    try
+    {
+      string sqlGetMovies = "SELECT * FROM movies ORDER BY id";
+      MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand();
+      cmd.CommandText = sqlGetMovies;
+      MySqlDataReader reader = cmd.ExecuteReader();
+      while (reader.Read())
+      {
+        int id = reader.GetInt32("id");
+        string title = reader.GetString("title");
+        DateTime releaseDate = reader.GetDateTime("release_date");
+        // ... (add other movie properties)
+        Movie movie = new Movie(id, title, releaseDate, /* other properties */);
+        list.Add(movie);
+      }
+      conn.Close();
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.Message);
+    }
+    return list;
+  }
+
+  private void DeleteMovie(int movieId)
+  {
+    try
+    {
+      string sqlDeleteMovie = $"UPDATE movies SET isDeleted=1 WHERE id={movieId}";
+      MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+      conn.Open();
+      MySqlCommand cmd = conn.CreateCommand();
+      cmd.CommandText = sqlDeleteMovie;
+      cmd.ExecuteNonQuery();
+      conn.Close();
+      movies.RemoveAll(m => m.Id == movieId); // Update local list for immediate UI update
+      NavigationManager.NavigateTo("/movies/list");
+    }
+    catch (Exception ex)
+    {
+      // Handle error
+    }
