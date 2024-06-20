@@ -1,0 +1,112 @@
+﻿<h3>AgeList</h3>
+@page "/age/list"
+@using BlazorApp5.Data
+@using MySql.Data.MySqlClient
+@inject NavigationManager NavigationManager
+
+<PageTitle>List of Ages</PageTitle>
+
+@if (Age == null)
+{
+    <h3>Không có dữ liệu</h3>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-12">
+                <Button Type="ButtonType.Link" Color="ButtonColor.Primary" Class="mb-3" To="/Ages/create">Create Age</Button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <Grid TItem="Age"
+                      Class="table table-hover table-bordered table-striped"
+                      DataProvider="AgesDataProvider"
+                      AllowFiltering="true"
+                      AllowPaging="true"
+                      PageSize="10"
+                      AllowSorting="true"
+                      Responsive="true">
+
+                    <GridColumn TItem="Age" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
+                        @context.Id
+                    </GridColumn>
+                    <GridColumn TItem="Age" HeaderText="Title" PropertyName="Title" SortKeySelector="item => item.Name">
+                        @context.Name
+                    </GridColumn>
+                    @*  <GridColumn TItem="Age" HeaderText="Action">
+                <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=$"/Ages/edit/{@context.Id}">Edit</Button>
+                <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(AgeId) => DeleteAge(AgeId)">Delete</Button>
+                </GridColumn> *@
+
+                </Grid>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    public List<Age> Age;
+
+    protected override void OnInitialized()
+    {
+        Age = GetAges();
+    }
+
+    private async Task<GridDataProviderResult<Age>> AgesDataProvider(GridDataProviderRequest<Age> request)
+    {
+        if (Age is null) // pull Ages only once for client-side filtering, sorting, and paging
+            Age = GetAges(); // call a service or an API to pull the Ages
+
+        return await Task.FromResult(request.ApplyTo(Age));
+    }
+
+    private List<Age> GetAges()
+    {
+        List<Age> list = new List<Age>();
+        try
+        {
+            string sqlGetAges = "SELECT * FROM Ages ORDER BY id";
+            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlGetAges;
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32("id");
+                string name = reader.GetString("name");
+                Age Age = new Age(id, name);
+                list.Add(Age);
+            }
+            conn.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return list;
+    }
+
+    private void DeleteAge(int AgeId)
+    {
+        try
+        {
+            string sqlDeleteAge = $"UPDATE Ages SET isDeleted=1 WHERE id={AgeId}";
+            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlDeleteAge;
+            cmd.ExecuteNonQuery();
+            conn.Close();
+            Age.RemoveAll(m => m.Id == AgeId); // Update local list for immediate UI update
+            NavigationManager.NavigateTo("/Ages/list");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+
+        }
+    }
+}

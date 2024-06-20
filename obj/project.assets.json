@@ -2363,11 +2363,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ADMIN\\source\\repos\\C\\C.csproj",
-      "projectName": "C",
-      "projectPath": "C:\\Users\\ADMIN\\source\\repos\\C\\C.csproj",
+      "projectUniqueName": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\BlazorApp5.csproj",
+      "projectName": "BlazorApp5",
+      "projectPath": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\BlazorApp5.csproj",
       "packagesPath": "C:\\Users\\ADMIN\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ADMIN\\source\\repos\\C\\obj\\",
+      "outputPath": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\ADMIN\\AppData\\Roaming\\NuGet\\NuGet.Config",

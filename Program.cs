@@ -1,4 +1,4 @@
-using C.Components;
+using BlazorApp5.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddBlazorBootstrap();

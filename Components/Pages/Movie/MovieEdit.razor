@@ -1,0 +1,160 @@
+﻿@page "/movie/edit/{Id:int}"
+@using BlazorApp5.Data
+@using MySql.Data.MySqlClient
+@inject NavigationManager NavigationManager
+
+
+<h3>Movie Update</h3>
+<div class="container">
+	<EditForm Model="movie" OnValidSubmit="HandleUpdateMovie">
+		<div class="row">
+			<div class="col-12">
+				<DataAnnotationsValidator />
+				<div class="mb-3">
+					<label class="form-label">Title</label>
+					<InputText class="form-control" required @bind-Value=movie.Title />
+					<ValidationMessage For="() => movie.Title" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Director</label>
+					<InputText class="form-control" required @bind-Value=movie.Director />
+					<ValidationMessage For="() => movie.Director" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Description</label>
+					<InputText class="form-control" required @bind-Value=movie.Description />
+					<ValidationMessage For="() => movie.Director" />
+				</div>
+				<div class="mb-3">
+					<label class="form-label">Language</label>
+					<InputText class="form-control" required @bind-Value=movie.Language />
+					<ValidationMessage For="() => movie.Language" />
+				</div>
+			</div>
+			<div class="col-12">
+				<div class="mb-3">
+					<label class="form-label">Status</label>
+					<InputSelect @bind-Value=movie.Status required class="form-control">
+						<option value="1">Active</option>
+						<option value="0">Deleted</option>
+					</InputSelect>
+					<ValidationMessage For="() => movie.Status" />
+				</div>
+			</div>
+			<div class="col-6">
+				<div class="mb-3">
+					<label class="form-label">File</label>
+					<InputFile class="form-control" OnChange="HandleFileSeclected"></InputFile>
+					@if (ImageDataUrl != "")
+					{
+						<img src="@ImageDataUrl" style="max-width: 500px;" />
+					}
+
+				</div>
+				<div class="mb-3">
+					<Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+				</div>
+			</div>
+		</div>
+	</EditForm>
+</div>
+@code {
+	[Parameter]
+	public int Id { get; set; }
+	Movie movie = new Movie();
+	//(int id, string title,string director, string description,string image, TimeSpan duration,DateTime releaseDate, string language,int status
+	private string ImageDataUrl = "";
+	private IBrowserFile selectedFile;
+
+
+	
+	private List<Movie> GetMovieById(int Id)
+	{
+		List<Movie> list = new List<Movie>();
+		try
+		{
+			string sqlGetMovies = $"SELECT * FROM movies where id = {Id}";
+			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+			conn.Open();
+			MySqlCommand cmd = conn.CreateCommand();
+			cmd.CommandText = sqlGetMovies;
+			MySqlDataReader reader = cmd.ExecuteReader();
+			while (reader.Read())
+			{
+				int id = reader.GetInt32("id");
+				string title = reader.GetString("title");
+				string director = reader.GetString("director");
+				string image = reader.GetString("image");
+				string description = reader.GetString("description");
+				string language = reader.GetString("language");
+				int status = reader.GetInt16("status");
+				Movie movie = new Movie(id, title, director, description, image, language, status);
+				list.Add(movie);
+			}
+			conn.Close();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+		return list;
+	}
+	protected override async Task OnInitializedAsync()
+	{
+		 
+		if (GetMovieById(Id) == null)
+		{
+			NavigationManager.NavigateTo("/movie/list");
+		}
+	}
+	private async void HandleUpdateMovie()
+	{
+		try
+		{
+			await SaveImageToServer(selectedFile);
+			string Title = movie.Title;
+			string Director = movie.Director;
+			string Description = movie.Description;
+			string Language = movie.Language;
+			int Status = movie.Status;
+			string Image = movie.Image;
+			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}')";
+			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+			conn.Open();
+			MySqlCommand cmd = conn.CreateCommand();
+			cmd.CommandText = SqlInsertMovie;
+			cmd.ExecuteNonQuery();
+			conn.Close();
+			NavigationManager.NavigateTo("/movie/list");
+		}
+		catch (Exception ex)
+		{
+
+			Console.WriteLine(ex.Message);
+
+		}
+	}
+
+
+	private async Task HandleFileSeclected(InputFileChangeEventArgs e)
+	{
+		selectedFile = e.File;
+		var resizeFile = await e.File.RequestImageFileAsync("image/jpeg", 500, 500);
+		var buffer = new byte[resizeFile.Size];
+		await resizeFile.OpenReadStream().ReadAsync(buffer);
+		ImageDataUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
+	}
+
+	private async Task SaveImageToServer(IBrowserFile file)
+	{
+		var FileName = file.Name;
+		var folderPath = Path.Combine("wwwroot", "uploads"); //wwwroot/uploads
+		var filePath = Path.Combine(folderPath, FileName); //wwwroot/uploads/...
+		Directory.CreateDirectory(folderPath);
+		using (var fileStream = new FileStream(filePath, FileMode.Create))
+		{
+			await file.OpenReadStream().CopyToAsync(fileStream);
+		}
+		movie.Image = $"uploads/{FileName}";
+	}
+}
