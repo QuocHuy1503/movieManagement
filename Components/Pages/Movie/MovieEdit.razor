@@ -12,29 +12,29 @@
 				<DataAnnotationsValidator />
 				<div class="mb-3">
 					<label class="form-label">Title</label>
-					<InputText class="form-control" required @bind-Value=movie.Title />
+					<InputText class="form-control" @bind-Value=movie.Title />
 					<ValidationMessage For="() => movie.Title" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Director</label>
-					<InputText class="form-control" required @bind-Value=movie.Director />
+					<InputText class="form-control"  @bind-Value=movie.Director />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Description</label>
-					<InputText class="form-control" required @bind-Value=movie.Description />
+					<InputText class="form-control"  @bind-Value=movie.Description />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Language</label>
-					<InputText class="form-control" required @bind-Value=movie.Language />
+					<InputText class="form-control"  @bind-Value=movie.Language />
 					<ValidationMessage For="() => movie.Language" />
 				</div>
 			</div>
 			<div class="col-12">
 				<div class="mb-3">
 					<label class="form-label">Status</label>
-					<InputSelect @bind-Value=movie.Status required class="form-control">
+					<InputSelect @bind-Value=movie.Status class="form-control">
 						<option value="1">Active</option>
 						<option value="0">Deleted</option>
 					</InputSelect>
@@ -59,15 +59,16 @@
 	</EditForm>
 </div>
 @code {
+
 	[Parameter]
 	public int Id { get; set; }
+
 	Movie movie = new Movie();
-	//(int id, string title,string director, string description,string image, TimeSpan duration,DateTime releaseDate, string language,int status
+
 	private string ImageDataUrl = "";
+
 	private IBrowserFile selectedFile;
 
-
-	
 	private List<Movie> GetMovieById(int Id)
 	{
 		List<Movie> list = new List<Movie>();
@@ -79,18 +80,19 @@
 			MySqlCommand cmd = conn.CreateCommand();
 			cmd.CommandText = sqlGetMovies;
 			MySqlDataReader reader = cmd.ExecuteReader();
-			while (reader.Read())
-			{
-				int id = reader.GetInt32("id");
-				string title = reader.GetString("title");
-				string director = reader.GetString("director");
-				string image = reader.GetString("image");
-				string description = reader.GetString("description");
-				string language = reader.GetString("language");
-				int status = reader.GetInt16("status");
-				Movie movie = new Movie(id, title, director, description, image, language, status);
-				list.Add(movie);
-			}
+			// while (reader.Read())
+			// {
+			// 	int id = reader.GetInt32("id");
+			// 	string title = reader.GetString("title");
+			// 	string director = reader.GetString("director");
+			// 	string image = reader.GetString("image");
+			// 	string description = reader.GetString("description");
+			// 	string language = reader.GetString("language");
+			// 	int status = reader.GetInt16("status");
+			// 	Movie movie = new Movie(id, title, director, description, image, language, status);
+			// 	list.Add(movie);
+			// }
+			
 			conn.Close();
 		}
 		catch (Exception ex)
@@ -111,14 +113,20 @@
 	{
 		try
 		{
-			await SaveImageToServer(selectedFile);
+			if (selectedFile != null)
+			{
+				await SaveImageToServer(selectedFile);
+				movie.Image = $"uploads/{selectedFile.Name}";
+			}
+
 			string Title = movie.Title;
 			string Director = movie.Director;
 			string Description = movie.Description;
 			string Language = movie.Language;
 			int Status = movie.Status;
 			string Image = movie.Image;
-			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}')";
+			string SqlInsertMovie = 
+			$"UPDATE movies SET title = '{Title}', director = '{Director}',description = '{Description}', language = '{Language}', status = '{Status} , image = '{Image} where id = '{Id}'";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();
 			MySqlCommand cmd = conn.CreateCommand();
