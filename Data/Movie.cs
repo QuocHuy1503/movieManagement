@@ -13,7 +13,10 @@
 /*        public required float Price { get; set; }
 */       /* public required string IsFeatured { get; set; }*/
         public  int Status { get; set; }
-        
+
+        public int AgeId {  get; set; }
+
+        public string AgeName { get; set; }
         public Movie()
         {
 
@@ -22,7 +25,7 @@
         public Movie(int id, string title, 
             string director, string description, 
             string image, string language, 
-            int status)
+            int status, int age_id)
         {
             Id = id;
             Title = title;
@@ -32,6 +35,7 @@
           
             Language = language;
             Status = status;
+            AgeId = age_id;
         }
     }
 }

@@ -6,7 +6,7 @@
 
 <h3>Movie Update</h3>
 <div class="container">
-	<EditForm Model="movie" OnValidSubmit="HandleUpdateMovie">
+	<EditForm Model="movie" OnValidSubmit="UpdateMovie">
 		<div class="row">
 			<div class="col-12">
 				<DataAnnotationsValidator />
@@ -44,7 +44,7 @@
 			<div class="col-6">
 				<div class="mb-3">
 					<label class="form-label">File</label>
-					<InputFile class="form-control" OnChange="HandleFileSeclected"></InputFile>
+                    <InputFile class="form-control" OnChange="HandleFileSelected"></InputFile>
 					@if (ImageDataUrl != "")
 					{
 						<img src="@ImageDataUrl" style="max-width: 500px;" />
@@ -58,98 +58,131 @@
 		</div>
 	</EditForm>
 </div>
+
 @code {
+    [Parameter]
+    public int Id { get; set; }
 
-	[Parameter]
-	public int Id { get; set; }
+    Movie movie = new Movie();
+    // List<Brand> brands = new List<Brand>();
 
-	Movie movie = new Movie();
+    private string ImageDataUrl = "";
+    private IBrowserFile selectedFile;
 
-	private string ImageDataUrl = "";
+   
 
-	private IBrowserFile selectedFile;
+    protected override void OnParametersSet()
+    {
+        if (Id != 0)
+        {
+            movie = GetMovie(Id);
+            // GetBrands();
+        }
+    }
 
-	public Movie GetMovieById(int Id)
-	{
-		try
-		{
-			string sqlGetMovies = $"SELECT * FROM movies where id = {Id}";
-			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
-			conn.Open();
-			MySqlCommand cmd = conn.CreateCommand();
-			cmd.CommandText = sqlGetMovies;
-			MySqlDataReader reader = cmd.ExecuteReader();
-			while (reader.Read())
-			{
-				movie.Id = reader.GetInt32("id");
-				movie.Title = reader.GetString("title");
-				movie.Director = reader.GetString("director");
-				movie.Image = reader.GetString("image");
-				movie.Description = reader.GetString("description");
-				movie.Language = reader.GetString("language");
-				movie.Status = reader.GetInt16("status");
-				ImageDataUrl = movie.Image;
-			}
-			conn.Close();
-		}
-		catch (Exception ex)
-		{
-			Console.WriteLine(ex.Message);
-		}
-		return movie;
-	}
-	protected override void OnParametersSet()
-	{
+    public Movie GetMovie(int Id)
+    {
+        var conn = DBMySQLUltils.GetMySqlConnection();
+        try
+        {
+            conn.Open();
+            string sqlGetmovie = $"SELECT * FROM movies WHERE id = {Id}";
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlGetmovie;
+            MySqlDataReader mySqlDataReader = cmd.ExecuteReader();
+            if (mySqlDataReader.Read())
+            {
+                movie.Id = mySqlDataReader.GetInt32("id");
+                movie.Title = mySqlDataReader.GetString("title");
+                movie.Description = mySqlDataReader.GetString("description");
+                movie.Director = mySqlDataReader.GetString("director");
+                movie.Language = mySqlDataReader.GetString("language");
+                movie.Image = mySqlDataReader.GetString("image");
+                movie.Status = mySqlDataReader.GetInt32("status");
+                ImageDataUrl = movie.Image;
+            }
 
-		if (Id != 0)
-		{
-			movie = GetMovieById(Id);
-		}
-		else
-		{
-			NavigationManager.NavigateTo("/movie/list");
-		}
-	}
-	private async void HandleUpdateMovie()
-	{
-		await SaveImageToServer(selectedFile);
-		string Title = movie.Title;
-		string Director = movie.Director;
-		string Description = movie.Description;
-		string Language = movie.Language;
-		int Status = movie.Status;
-		string Image = movie.Image;
-		string SqlInsertMovie =
-		$"UPDATE movies SET title = '{Title}', director = '{Director}',description = '{Description}', language = '{Language}', status = '{Status} , image = '{Image} where id = '{Id}'";
-		MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
-		conn.Open();
-		MySqlCommand cmd = conn.CreateCommand();
-		cmd.CommandText = SqlInsertMovie;
-		cmd.ExecuteNonQuery();
-		conn.Close();
-		NavigationManager.NavigateTo("/movie/list");
-	}
+            conn.Close();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+        }
+        return movie;
+    }
 
+    // public void GetBrands()
+    // {
+    //     var conn = DBMySQLUltils.GetMySqlConnection();
+    //     try
+    //     {
+    //         conn.Open();
+    //         string sqlGetBrands = "SELECT * FROM brands";
+    //         MySqlCommand cmd = conn.CreateCommand();
+    //         cmd.CommandText = sqlGetBrands;
+    //         MySqlDataReader mySqlDataReader = cmd.ExecuteReader();
+    //         while (mySqlDataReader.Read())
+    //         {
+    //             Brand br = new Brand();
+    //             br.Id = mySqlDataReader.GetInt32("id");
+    //             br.Name = mySqlDataReader.GetString("name");
+    //             br.IsDeleted = mySqlDataReader.GetInt32("is_deleted");
+    //             brands.Add(br);
+    //         }
 
-	private async Task HandleFileSeclected(InputFileChangeEventArgs e)
-	{
-		selectedFile = e.File;
-		var resizeFile = await e.File.RequestImageFileAsync("image/jpeg", 500, 500);
-		var buffer = new byte[resizeFile.Size];
-		await resizeFile.OpenReadStream().ReadAsync(buffer);
-		ImageDataUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
-	}
+    //         conn.Close();
+    //     }
+    //     catch (Exception e)
+    //     {
+    //         Console.WriteLine(e.Message);
+    //     }
 
-	private async Task SaveImageToServer(IBrowserFile file)
-	{
-		var FileName = file.Name;
-		var folderPath = Path.Combine("wwwroot", "uploads"); //wwwroot/uploads
-		var filePath = Path.Combine(folderPath, FileName); //wwwroot/uploads/...
-		Directory.CreateDirectory(folderPath);
-		using (var fileStream = new FileStream(filePath, FileMode.Create))
-		{
-			await file.OpenReadStream().CopyToAsync(fileStream);
-		}
-		movie.Image = $"uploads/{FileName}";
-	}
+    //     foreach (var br in brands)
+    //     {
+    //         Console.WriteLine(br.Name);
+    //     }
+    // }
+
+    private async Task HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        var resizeFile = await e.File.RequestImageFileAsync("image/jpeg", 500, 500);
+        var buffer = new byte[resizeFile.Size];
+        await resizeFile.OpenReadStream().ReadAsync(buffer);
+        ImageDataUrl = $"data:image/jpeg;base64,{Convert.ToBase64String(buffer)}";
+    }
+
+    private async Task SaveImageToServer(IBrowserFile file)
+    {
+        if (file != null)
+        {
+            var FileName = file.Name;
+            var folderPath = Path.Combine("wwwroot", "uploads"); //wwwroot/uploads
+            var filePath = Path.Combine(folderPath, FileName); //wwwroot/uploads/...
+            Directory.CreateDirectory(folderPath);
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.OpenReadStream().CopyToAsync(fileStream);
+            }
+            movie.Image = $"uploads/{FileName}";
+        }
+    }
+
+    protected async void UpdateMovie()
+    {
+        await SaveImageToServer(selectedFile);
+        string Title = movie.Title;
+        string Description = movie.Description;
+        string Director = movie.Director;
+        int Status = movie.Status;
+        string Language = movie.Language;
+        string Image = movie.Image;
+        string SqlUpdate = $"UPDATE movies SET title = '{Title}', description = '{Description}', director = '{Director}', status = '{Status}', image = '{Image}', language = '{Language}' WHERE id = '{Id}'";
+        MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+        conn.Open();
+        MySqlCommand cmd = new MySqlCommand(SqlUpdate, conn);
+        cmd.ExecuteNonQuery();
+        conn.Close();
+        NavigationManager.NavigateTo("/movie/list", forceLoad: true);
+    }
 }

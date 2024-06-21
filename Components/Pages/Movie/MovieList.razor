@@ -41,6 +41,33 @@ else
                     <GridColumn TItem="Movie" HeaderText="Language" PropertyName="" SortKeySelector="item => item.Language">
                             @context.Language
                     </GridColumn>
+                    <GridColumn TItem="Movie" HeaderText="Age" PropertyName="" SortKeySelector="item => item.AgeId">
+                        @{
+                            try
+                            {
+                                string SqlGetBrand = String.Format($"SELECT * FROM ages WHERE id = {context.AgeId}");
+                                MySqlConnection conn1 = DBMySQLUltils.GetMySqlConnection();
+                                MySqlCommand cmd1 = conn1.CreateCommand();
+                                conn1.Open();
+                                cmd1.CommandText = SqlGetBrand;
+                                MySqlDataReader mySqlDataReader1 = cmd1.ExecuteReader();
+                                while (mySqlDataReader1.Read())
+                                {
+                                    ageId = mySqlDataReader1.GetInt32("id");
+                                    ageName = mySqlDataReader1.GetString("name");
+                                }
+                                conn1.Close();
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine(e.Message);
+                            }
+                        }
+                        @if (ageName != "" && ageName != null && context.AgeId != 0)
+                        {
+                            @ageName
+                        }
+                    </GridColumn>
                     <GridColumn TItem="Movie" HeaderText="Image" PropertyName="" SortKeySelector="item => item.Image">
                         <img src="@context.Image" style="width:250px;height:150px"/>
                     </GridColumn>
@@ -67,6 +94,10 @@ else
 
 @code {
     public List<Movie> movie;
+
+    private int ageId;
+
+    private string ageName;
 
     protected override void OnInitialized()
     {
@@ -101,7 +132,8 @@ else
                 string description = reader.GetString("description");
                 string language = reader.GetString("language");
                 int status = reader.GetInt16("status");
-                Movie movie = new Movie(id, title, director, description, image,  language, status);
+                int age_id = reader.GetInt16("age_id");
+                Movie movie = new Movie(id, title, director, description, image,  language, status, age_id);
                 list.Add(movie);
             }
             conn.Close();
@@ -111,6 +143,33 @@ else
             Console.WriteLine(ex.Message);
         }
         return list;
+    }
+
+    public List<Age> getAges()
+    {
+        List<Age> ages = new List<Age>();
+        try
+        {
+            string sqlGetMovies = "SELECT * FROM ages ORDER BY id";
+            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlGetMovies;
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                int id = reader.GetInt32("id");
+                string name = reader.GetString("name");
+                Age age = new Age(id, name);
+                ages.Add(age);
+            }
+            conn.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return ages;
     }
 
     private void DeleteMovie(int movieId)
