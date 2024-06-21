@@ -11,4 +11,10 @@
     <PackageReference Include="MySql.Data" Version="8.4.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Components\Pages\Age\AgeCreate.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

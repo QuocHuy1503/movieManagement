@@ -11,23 +11,23 @@
 			<div class="col-12">
 				<DataAnnotationsValidator />
 				<div class="mb-3">
-					<label class="form-label">Title</label>
+					<label for="Title" class="form-label">Title</label>
 					<InputText class="form-control" @bind-Value=movie.Title />
 					<ValidationMessage For="() => movie.Title" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Director</label>
-					<InputText class="form-control"  @bind-Value=movie.Director />
+					<InputText class="form-control" @bind-Value=movie.Director />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Description</label>
-					<InputText class="form-control"  @bind-Value=movie.Description />
+					<InputText class="form-control" @bind-Value=movie.Description />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Language</label>
-					<InputText class="form-control"  @bind-Value=movie.Language />
+					<InputText class="form-control" @bind-Value=movie.Language />
 					<ValidationMessage For="() => movie.Language" />
 				</div>
 			</div>
@@ -69,9 +69,8 @@
 
 	private IBrowserFile selectedFile;
 
-	private List<Movie> GetMovieById(int Id)
+	public Movie GetMovieById(int Id)
 	{
-		List<Movie> list = new List<Movie>();
 		try
 		{
 			string sqlGetMovies = $"SELECT * FROM movies where id = {Id}";
@@ -80,67 +79,55 @@
 			MySqlCommand cmd = conn.CreateCommand();
 			cmd.CommandText = sqlGetMovies;
 			MySqlDataReader reader = cmd.ExecuteReader();
-			// while (reader.Read())
-			// {
-			// 	int id = reader.GetInt32("id");
-			// 	string title = reader.GetString("title");
-			// 	string director = reader.GetString("director");
-			// 	string image = reader.GetString("image");
-			// 	string description = reader.GetString("description");
-			// 	string language = reader.GetString("language");
-			// 	int status = reader.GetInt16("status");
-			// 	Movie movie = new Movie(id, title, director, description, image, language, status);
-			// 	list.Add(movie);
-			// }
-			
+			while (reader.Read())
+			{
+				movie.Id = reader.GetInt32("id");
+				movie.Title = reader.GetString("title");
+				movie.Director = reader.GetString("director");
+				movie.Image = reader.GetString("image");
+				movie.Description = reader.GetString("description");
+				movie.Language = reader.GetString("language");
+				movie.Status = reader.GetInt16("status");
+				ImageDataUrl = movie.Image;
+			}
 			conn.Close();
 		}
 		catch (Exception ex)
 		{
 			Console.WriteLine(ex.Message);
 		}
-		return list;
+		return movie;
 	}
-	protected override async Task OnInitializedAsync()
+	protected override void OnParametersSet()
 	{
-		 
-		if (GetMovieById(Id) == null)
+
+		if (Id != 0)
+		{
+			movie = GetMovieById(Id);
+		}
+		else
 		{
 			NavigationManager.NavigateTo("/movie/list");
 		}
 	}
 	private async void HandleUpdateMovie()
 	{
-		try
-		{
-			if (selectedFile != null)
-			{
-				await SaveImageToServer(selectedFile);
-				movie.Image = $"uploads/{selectedFile.Name}";
-			}
-
-			string Title = movie.Title;
-			string Director = movie.Director;
-			string Description = movie.Description;
-			string Language = movie.Language;
-			int Status = movie.Status;
-			string Image = movie.Image;
-			string SqlInsertMovie = 
-			$"UPDATE movies SET title = '{Title}', director = '{Director}',description = '{Description}', language = '{Language}', status = '{Status} , image = '{Image} where id = '{Id}'";
-			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
-			conn.Open();
-			MySqlCommand cmd = conn.CreateCommand();
-			cmd.CommandText = SqlInsertMovie;
-			cmd.ExecuteNonQuery();
-			conn.Close();
-			NavigationManager.NavigateTo("/movie/list");
-		}
-		catch (Exception ex)
-		{
-
-			Console.WriteLine(ex.Message);
-
-		}
+		await SaveImageToServer(selectedFile);
+		string Title = movie.Title;
+		string Director = movie.Director;
+		string Description = movie.Description;
+		string Language = movie.Language;
+		int Status = movie.Status;
+		string Image = movie.Image;
+		string SqlInsertMovie =
+		$"UPDATE movies SET title = '{Title}', director = '{Director}',description = '{Description}', language = '{Language}', status = '{Status} , image = '{Image} where id = '{Id}'";
+		MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+		conn.Open();
+		MySqlCommand cmd = conn.CreateCommand();
+		cmd.CommandText = SqlInsertMovie;
+		cmd.ExecuteNonQuery();
+		conn.Close();
+		NavigationManager.NavigateTo("/movie/list");
 	}
 
 

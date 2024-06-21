@@ -15,7 +15,7 @@ else
     <div class="container">
         <div class="row">
             <div class="col-12">
-                <Button Type="ButtonType.Link" Color="ButtonColor.Primary" Class="mb-3" To="/Ages/create">Create Age</Button>
+                <Button Type="ButtonType.Link" Color="ButtonColor.Primary" Class="mb-3" To="/age/create">Create Ages</Button>
             </div>
         </div>
         <div class="row">
@@ -32,13 +32,13 @@ else
                     <GridColumn TItem="Age" HeaderText="Id" PropertyName="Id" SortKeySelector="item => item.Id">
                         @context.Id
                     </GridColumn>
-                    <GridColumn TItem="Age" HeaderText="Title" PropertyName="Title" SortKeySelector="item => item.Name">
+                    <GridColumn TItem="Age" HeaderText="Name" PropertyName="Name" SortKeySelector="item => item.Name">
                         @context.Name
                     </GridColumn>
-                    @*  <GridColumn TItem="Age" HeaderText="Action">
-                <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=$"/Ages/edit/{@context.Id}">Edit</Button>
-                <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(AgeId) => DeleteAge(AgeId)">Delete</Button>
-                </GridColumn> *@
+                       <GridColumn TItem="Age" HeaderText="Action">
+                        <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=@($"/age/edit/{@context.Id}")>Edit</Button>
+                        <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteAge(context.Id)">Delete</Button>
+                  </GridColumn> 
 
                 </Grid>
             </div>

@@ -83,7 +83,8 @@
 			cmd.CommandText = SqlInsertMovie;
 			cmd.ExecuteNonQuery();
 			conn.Close();
-			NavigationManager.NavigateTo("/movie/list");
+			NavigationManager.NavigateTo("/movie/list",forceLoad:true);
+
 		}
 		catch (Exception ex)
 		{

@@ -1,0 +1,50 @@
+﻿@page "/age/create"
+@using BlazorApp5.Data
+@using MySql.Data.MySqlClient
+@inject NavigationManager NavigationManager
+
+
+<h3>CREATE AGES</h3>
+<div class="container">
+	<EditForm Model="age" OnValidSubmit="HandleCreateAge">
+		<div class="row">
+			<div class="col-12">
+				<DataAnnotationsValidator />
+				<div class="mb-3">
+					<label class="form-label">Name</label>
+					<InputText class="form-control" required @bind-Value=age.Name DisplayName="Enter"/>
+					<ValidationMessage For="() => age.Name" />
+				</div>
+			</div>
+			<div class="col-6">
+				<div class="mb-3">
+					<Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
+				</div>
+			</div>
+		</div>
+	</EditForm>
+</div>
+@code {
+	Age age = new Age();
+	private async void HandleCreateAge()
+	{
+		try
+		{
+			string name = age.Name;
+			string SqlInsertMovie = $"INSERT INTO ages(name) VALUES('{name}')";
+			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+			conn.Open();
+			MySqlCommand cmd = conn.CreateCommand();
+			cmd.CommandText = SqlInsertMovie;
+			cmd.ExecuteNonQuery();
+			conn.Close();
+			NavigationManager.NavigateTo("/age/list");
+		}
+		catch (Exception ex)
+		{
+			
+			Console.WriteLine(ex.Message);
+
+		}
+	}
+}

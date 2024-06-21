@@ -5,6 +5,11 @@
         public int Id { get; set; }
         public string Name { get; set; }
 
+        public Age()
+        {
+
+        }
+
         public Age(int id, string name)
         {
             Id = id;
