@@ -4,7 +4,7 @@
 @inject NavigationManager NavigationManager
 
 
-<h3>CreateUser</h3>
+<h3>Create Movie </h3>
 <div class="container">
 	<EditForm Model="movie" OnValidSubmit="HandleCreateMovie">
 		<div class="row">
@@ -31,8 +31,8 @@
 					<ValidationMessage For="() => movie.Language" />
 				</div>
 			</div>
-			<div class="col-12">
-				<div class="mb-3">
+			<div class="col-12 d-flex flex-row justify-content-between">
+				<div class="col-4 mb-3">
 					<label class="form-label">Status</label>
 					<InputSelect @bind-Value=movie.Status required class="form-control">
 						<option value="1">Active</option>
@@ -40,7 +40,17 @@
 					</InputSelect>
 					<ValidationMessage For="() => movie.Status" />
 				</div>
+				<div class="col-4 mb-3">
+					<label class="form-label">Age</label>
+					<InputSelect @bind-Value=movie.AgeId required class="form-control">
+						@foreach (var age in ages)
+						{
+							<option value="@age.Id">@age.Name</option>
+						}
+					</InputSelect>
+					<ValidationMessage For="() => movie.AgeId" />
 				</div>
+			</div>
 			<div class="col-6">
 				<div class="mb-3">
 					<label class="form-label">File</label>
@@ -60,12 +70,76 @@
 </div>
 @code {
 
-	Movie movie = new Movie();
-	//(int id, string title,string director, string description,string image, TimeSpan duration,DateTime releaseDate, string language,int status
-	private string ImageDataUrl = "";
-	private IBrowserFile selectedFile;
+    Movie movie = new Movie();
+    //(int id, string title,string director, string description,string image, TimeSpan duration,DateTime releaseDate, string language,int status
+    private string ImageDataUrl = "";
+    private IBrowserFile selectedFile;
+    List<Age> ages;
+    protected override async Task OnInitializedAsync()
+    {
+        movie.AgeId = 1; // Set a default age (optional)
+        ages = await GetAgesAsync();
+    }
 
-	private async void HandleCreateMovie()
+    // private async void HandleCreateMovie()
+    // {
+    // 	try
+    // 	{
+    // 		await SaveImageToServer(selectedFile);
+    // 		string Title = movie.Title;
+    // 		string Director = movie.Director;
+    // 		string Description = movie.Description;
+    // 		string Language = movie.Language;
+    // 		int Status = movie.Status;
+    // 		string Image = movie.Image;
+    // 		string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}')";
+    // 		MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+    // 		conn.Open();
+    // 		MySqlCommand cmd = conn.CreateCommand();
+    // 		cmd.CommandText = SqlInsertMovie;
+    // 		cmd.ExecuteNonQuery();
+    // 		conn.Close();
+    // 		NavigationManager.NavigateTo("/movie/list",forceLoad:true);
+
+    // 	}
+    // 	catch (Exception ex)
+    // 	{
+
+    // 		Console.WriteLine(ex.Message);
+
+    // 	}
+	// }
+
+    private async Task<List<Age>> GetAgesAsync()
+    {
+        List<Age> ages = new List<Age>();
+        try
+        {
+            string sqlGetAges = "SELECT * FROM ages ORDER BY id";
+            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlGetAges;
+			MySqlDataReader mySqlDataReader = cmd.ExecuteReader();
+			while (mySqlDataReader.Read())
+			{
+				int id = mySqlDataReader.GetInt32("id");
+				string name = mySqlDataReader.GetString("name");
+				Age age = new Age(id, name);
+				ages.Add(age);
+			}
+			conn.Close();
+		}
+		catch (Exception ex)
+		{
+			Console.WriteLine(ex.Message);
+		}
+		return ages;
+	}
+
+
+
+	private async Task HandleCreateMovie()
 	{
 		try
 		{
@@ -75,25 +149,22 @@
 			string Description = movie.Description;
 			string Language = movie.Language;
 			int Status = movie.Status;
+			int AgeId = movie.AgeId; // Use the bound AgeId property
 			string Image = movie.Image;
-			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}')";
+			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status, age_id) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}', '{AgeId}')";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();
 			MySqlCommand cmd = conn.CreateCommand();
 			cmd.CommandText = SqlInsertMovie;
 			cmd.ExecuteNonQuery();
 			conn.Close();
-			NavigationManager.NavigateTo("/movie/list",forceLoad:true);
-
+			NavigationManager.NavigateTo("/movie/list", forceLoad: true);
 		}
 		catch (Exception ex)
 		{
-			
 			Console.WriteLine(ex.Message);
-
 		}
 	}
-
 
 	private async Task HandleFileSeclected(InputFileChangeEventArgs e)
 	{
@@ -107,8 +178,8 @@
 	private async Task SaveImageToServer(IBrowserFile file)
 	{
 		var FileName = file.Name;
-		var folderPath = Path.Combine("wwwroot", "uploads"); //wwwroot/uploads
-		var filePath = Path.Combine(folderPath, FileName); //wwwroot/uploads/...
+		var folderPath = Path.Combine("wwwroot", "uploads");
+		var filePath = Path.Combine(folderPath, FileName);
 		Directory.CreateDirectory(folderPath);
 		using (var fileStream = new FileStream(filePath, FileMode.Create))
 		{

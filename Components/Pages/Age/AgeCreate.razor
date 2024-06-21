@@ -31,7 +31,7 @@
 		try
 		{
 			string name = age.Name;
-			string SqlInsertMovie = $"INSERT INTO ages(name) VALUES('{name}')";
+			string SqlInsertMovie = $"INSERT INTO ages (name) VALUES('{name}+')";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();
 			MySqlCommand cmd = conn.CreateCommand();
