@@ -25,7 +25,7 @@ else
                       DataProvider="AgesDataProvider"
                       AllowFiltering="true"
                       AllowPaging="true"
-                      PageSize="10"
+                      PageSize="4"
                       AllowSorting="true"
                       Responsive="true">
 
@@ -76,7 +76,7 @@ else
             while (reader.Read())
             {
                 int id = reader.GetInt32("id");
-                string name = reader.GetString("name");
+                int name = reader.GetInt32("name");
                 Age Age = new Age(id, name);
                 list.Add(Age);
             }

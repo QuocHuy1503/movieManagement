@@ -12,29 +12,29 @@
 				<DataAnnotationsValidator />
 				<div class="mb-3">
 					<label class="form-label">Title</label>
-					<InputText class="form-control" required @bind-Value=movie.Title />
+					<InputText class="form-control"  @bind-Value=movie.Title />
 					<ValidationMessage For="() => movie.Title" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Director</label>
-					<InputText class="form-control" required @bind-Value=movie.Director />
+					<InputText class="form-control"  @bind-Value=movie.Director />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Description</label>
-					<InputText class="form-control" required @bind-Value=movie.Description />
+					<InputText class="form-control"  @bind-Value=movie.Description />
 					<ValidationMessage For="() => movie.Director" />
 				</div>
 				<div class="mb-3">
 					<label class="form-label">Language</label>
-					<InputText class="form-control" required @bind-Value=movie.Language />
+					<InputText class="form-control"  @bind-Value=movie.Language />
 					<ValidationMessage For="() => movie.Language" />
 				</div>
 			</div>
 			<div class="col-12 d-flex flex-row justify-content-between">
 				<div class="col-4 mb-3">
 					<label class="form-label">Status</label>
-					<InputSelect @bind-Value=movie.Status required class="form-control">
+					<InputSelect @bind-Value=movie.Status  class="form-control">
 						<option value="1">Active</option>
 						<option value="0">Deleted</option>
 					</InputSelect>
@@ -42,7 +42,7 @@
 				</div>
 				<div class="col-4 mb-3">
 					<label class="form-label">Age</label>
-					<InputSelect @bind-Value=movie.AgeId required class="form-control">
+					<InputSelect @bind-Value=movie.AgeId  class="form-control">
 						@foreach (var age in ages)
 						{
 							<option value="@age.Id">@age.Name</option>
@@ -59,7 +59,6 @@
 					{
 						<img src="@ImageDataUrl" style="max-width: 500px;" />
 					}
-
 				</div>
 				<div class="mb-3">
 					<Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
@@ -95,7 +94,7 @@
 			while (mySqlDataReader.Read())
 			{
 				int id = mySqlDataReader.GetInt32("id");
-				string name = mySqlDataReader.GetString("name");
+				int name = mySqlDataReader.GetInt32("name");
 				Age age = new Age(id, name);
 				ages.Add(age);
 			}
@@ -122,6 +121,7 @@
 			int Status = movie.Status;
 			int AgeId = movie.AgeId; // Use the bound AgeId property
 			string Image = movie.Image;
+			
 			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status, age_id) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}', '{AgeId}')";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();

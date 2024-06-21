@@ -10,7 +10,7 @@
     <div class="form-group row mb-3">
         <div class="col-md-10">
             <label for="Name" class="form-label">Name</label>
-            <InputText @bind-Value=age.Name class="form-control" />
+            <InputNumber @bind-Value=age.Name class="form-control" min="3" max="20" />
             <div class="text-danger">
                 <ValidationMessage For="() => age.Name" />
             </div>
@@ -54,7 +54,7 @@
             if (mySqlDataReader.Read())
             {
                 age.Id = mySqlDataReader.GetInt32("id");
-                age.Name = mySqlDataReader.GetString("name");
+                age.Name = mySqlDataReader.GetInt32("name");
             }
             conn.Close();
         }
@@ -68,7 +68,7 @@
 
     protected void UpdateAge()
     {
-        string Name = age.Name;
+        int Name = age.Name;
         string SqlUpdate = $"UPDATE ages SET name = '{Name}' WHERE id = {Id}";
         MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
         conn.Open();

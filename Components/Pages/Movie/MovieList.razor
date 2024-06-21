@@ -54,7 +54,7 @@ else
                                 while (mySqlDataReader1.Read())
                                 {
                                     ageId = mySqlDataReader1.GetInt32("id");
-                                    ageName = mySqlDataReader1.GetString("name");
+                                    ageName = mySqlDataReader1.GetInt16("name");
                                 }
                                 conn1.Close();
                             }
@@ -63,7 +63,7 @@ else
                                 Console.WriteLine(e.Message);
                             }
                         }
-                        @if (ageName != "" && ageName != null && context.AgeId != 0)
+                        @if ( ageName != null && context.AgeId != 0)
                         {
                             @ageName
                         }
@@ -97,7 +97,7 @@ else
 
     private int ageId;
 
-    private string ageName;
+    private int ageName;
 
     protected override void OnInitialized()
     {
@@ -159,7 +159,7 @@ else
             while (reader.Read())
             {
                 int id = reader.GetInt32("id");
-                string name = reader.GetString("name");
+                int name = reader.GetInt32("name");
                 Age age = new Age(id, name);
                 ages.Add(age);
             }
