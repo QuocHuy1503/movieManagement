@@ -30,6 +30,19 @@
 					<InputText class="form-control" @bind-Value=movie.Language />
 					<ValidationMessage For="() => movie.Language" />
 				</div>
+                <div class="mb-3">
+                    <label class="form-label">Age</label>
+                    <InputSelect @bind-Value=movie.AgeId required class="form-control">
+                        @if (ages != null)
+                        {
+                            foreach (var age in ages)
+                            {
+                                <option value="@age.Id">@age.Name</option>
+                            }
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => movie.AgeId" />
+                </div>
 			</div>
 			<div class="col-12">
 				<div class="mb-3">
@@ -62,22 +75,49 @@
 @code {
     [Parameter]
     public int Id { get; set; }
-
+    List<Age> ages;
     Movie movie = new Movie();
     // List<Brand> brands = new List<Brand>();
 
     private string ImageDataUrl = "";
     private IBrowserFile selectedFile;
 
-   
 
-    protected override void OnParametersSet()
+
+    protected override async Task OnInitializedAsync()
     {
         if (Id != 0)
         {
             movie = GetMovie(Id);
-            // GetBrands();
+            ages = await GetAgesAsync();
         }
+    }
+
+    private async Task<List<Age>> GetAgesAsync()
+    {
+        List<Age> ages = new List<Age>();
+        try
+        {
+            string sqlGetAges = "SELECT * FROM ages ORDER BY id";
+            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+            conn.Open();
+            MySqlCommand cmd = conn.CreateCommand();
+            cmd.CommandText = sqlGetAges;
+            MySqlDataReader mySqlDataReader = cmd.ExecuteReader();
+            while (mySqlDataReader.Read())
+            {
+                int id = mySqlDataReader.GetInt32("id");
+                string name = mySqlDataReader.GetString("name");
+                Age age = new Age(id, name);
+                ages.Add(age);
+            }
+            conn.Close();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+        return ages;
     }
 
     public Movie GetMovie(int Id)
@@ -99,6 +139,7 @@
                 movie.Language = mySqlDataReader.GetString("language");
                 movie.Image = mySqlDataReader.GetString("image");
                 movie.Status = mySqlDataReader.GetInt32("status");
+                movie.AgeId = mySqlDataReader.GetInt16("age_id");
                 ImageDataUrl = movie.Image;
             }
 
@@ -177,7 +218,8 @@
         int Status = movie.Status;
         string Language = movie.Language;
         string Image = movie.Image;
-        string SqlUpdate = $"UPDATE movies SET title = '{Title}', description = '{Description}', director = '{Director}', status = '{Status}', image = '{Image}', language = '{Language}' WHERE id = '{Id}'";
+        int AgeId = movie.AgeId;
+        string SqlUpdate = $"UPDATE movies SET title = '{Title}', description = '{Description}', director = '{Director}', status = '{Status}', image = '{Image}', language = '{Language}', age_id = '{AgeId}' WHERE id = '{Id}'";
         MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
         conn.Open();
         MySqlCommand cmd = new MySqlCommand(SqlUpdate, conn);
