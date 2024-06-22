@@ -76,7 +76,7 @@ else
             while (reader.Read())
             {
                 int id = reader.GetInt32("id");
-                int name = reader.GetInt32("name");
+                string name = reader.GetString("name");
                 Age Age = new Age(id, name);
                 list.Add(Age);
             }

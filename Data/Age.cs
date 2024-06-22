@@ -4,11 +4,12 @@ namespace BlazorApp5.Data
 {
     public class Age
     {
-        [Required]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Name must be a number")]
+
         public int Id { get; set; }
-        
-        public int Name { get; set; }
+
+		[Required]
+        [RegularExpression(@"^[3-9][0-9]$|^1[0-9]$", ErrorMessage = "Age must be a number between 3 and 20 and doesn't contain any letter ")]
+		public string Name { get; set; }
 
 
         public Age()
@@ -16,7 +17,7 @@ namespace BlazorApp5.Data
 
         }
 
-        public Age(int id, int name)
+        public Age(int id, string name)
         {
             Id = id;
             Name = name;

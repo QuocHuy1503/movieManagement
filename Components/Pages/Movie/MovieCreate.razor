@@ -59,6 +59,7 @@
 					{
 						<img src="@ImageDataUrl" style="max-width: 500px;" />
 					}
+
 				</div>
 				<div class="mb-3">
 					<Button Type="ButtonType.Submit" Color="ButtonColor.Success">Save</Button>
@@ -69,32 +70,61 @@
 </div>
 @code {
 
-    Movie movie = new Movie();
-    private string ImageDataUrl = "";
-    private IBrowserFile selectedFile;
-    List<Age> ages;
-    protected override async Task OnInitializedAsync()
-    {
-        movie.AgeId = 1; // Set a default age (optional)
-		movie.Status = 1;
-        ages = await GetAgesAsync();
-    }
+	Movie movie = new Movie();
+	//(int id, string title,string director, string description,string image, TimeSpan duration,DateTime releaseDate, string language,int status
+	private string ImageDataUrl = "";
+	private IBrowserFile selectedFile;
+	List<Age> ages;
+	protected override async Task OnInitializedAsync()
+	{
+		movie.AgeId = 1; // Set a default age (optional)
+		ages = await GetAgesAsync();
+	}
 
-    private async Task<List<Age>> GetAgesAsync()
-    {
-        List<Age> ages = new List<Age>();
-        try
-        {
-            string sqlGetAges = "SELECT * FROM ages ORDER BY id";
-            MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
-            conn.Open();
-            MySqlCommand cmd = conn.CreateCommand();
-            cmd.CommandText = sqlGetAges;
+	// private async void HandleCreateMovie()
+	// {
+	// 	try
+	// 	{
+	// 		await SaveImageToServer(selectedFile);
+	// 		string Title = movie.Title;
+	// 		string Director = movie.Director;
+	// 		string Description = movie.Description;
+	// 		string Language = movie.Language;
+	// 		int Status = movie.Status;
+	// 		string Image = movie.Image;
+	// 		string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}')";
+	// 		MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+	// 		conn.Open();
+	// 		MySqlCommand cmd = conn.CreateCommand();
+	// 		cmd.CommandText = SqlInsertMovie;
+	// 		cmd.ExecuteNonQuery();
+	// 		conn.Close();
+	// 		NavigationManager.NavigateTo("/movie/list",forceLoad:true);
+
+	// 	}
+	// 	catch (Exception ex)
+	// 	{
+
+	// 		Console.WriteLine(ex.Message);
+
+	// 	}
+	// }
+
+	private async Task<List<Age>> GetAgesAsync()
+	{
+		List<Age> ages = new List<Age>();
+		try
+		{
+			string sqlGetAges = "SELECT * FROM ages ORDER BY id";
+			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
+			conn.Open();
+			MySqlCommand cmd = conn.CreateCommand();
+			cmd.CommandText = sqlGetAges;
 			MySqlDataReader mySqlDataReader = cmd.ExecuteReader();
 			while (mySqlDataReader.Read())
 			{
 				int id = mySqlDataReader.GetInt32("id");
-				int name = mySqlDataReader.GetInt32("name");
+				string name = mySqlDataReader.GetString("name");
 				Age age = new Age(id, name);
 				ages.Add(age);
 			}
@@ -121,7 +151,6 @@
 			int Status = movie.Status;
 			int AgeId = movie.AgeId; // Use the bound AgeId property
 			string Image = movie.Image;
-			
 			string SqlInsertMovie = $"INSERT INTO movies(title, director, description, image, language, status, age_id) VALUES('{Title}', '{Director}', '{Description}', '{Image}','{Language}','{Status}', '{AgeId}')";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();

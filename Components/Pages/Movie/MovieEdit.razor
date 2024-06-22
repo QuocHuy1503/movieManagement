@@ -107,7 +107,7 @@
             while (mySqlDataReader.Read())
             {
                 int id = mySqlDataReader.GetInt32("id");
-                int name = mySqlDataReader.GetInt32("name");
+                string name = mySqlDataReader.GetString("name");
                 Age age = new Age(id, name);
                 ages.Add(age);
             }

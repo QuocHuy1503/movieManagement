@@ -12,7 +12,7 @@
 				<DataAnnotationsValidator />
 				<div class="mb-3">
 					<label class="form-label">Name (Age between 3 and 20)</label>
-					<InputNumber class="form-control" required @bind-Value=age.Name min="3" max="20" />
+					<InputText class="form-control" @bind-Value=age.Name />
 					<ValidationMessage For="() => age.Name" />
 				</div>
 			</div>
@@ -30,7 +30,7 @@
 	{
 		try
 		{
-			int name = age.Name;
+			string name = age.Name;
 			string SqlInsertMovie = $"INSERT INTO ages (name) VALUES('{name}')";
 			MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
 			conn.Open();

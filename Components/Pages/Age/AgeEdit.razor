@@ -2,6 +2,7 @@
 @using BlazorApp5.Data
 @using MySql.Data.MySqlClient;
 @using BlazorBootstrap
+@using System.Data
 
 <h3 class="mb-3">Edit Age: @age.Name</h3>
 
@@ -54,7 +55,7 @@
             if (mySqlDataReader.Read())
             {
                 age.Id = mySqlDataReader.GetInt32("id");
-                age.Name = mySqlDataReader.GetInt32("name");
+                age.Name = mySqlDataReader.GetString("name");
             }
             conn.Close();
         }
@@ -68,7 +69,7 @@
 
     protected void UpdateAge()
     {
-        int Name = age.Name;
+        string Name = age.Name;
         string SqlUpdate = $"UPDATE ages SET name = '{Name}' WHERE id = {Id}";
         MySqlConnection conn = DBMySQLUltils.GetMySqlConnection();
         conn.Open();

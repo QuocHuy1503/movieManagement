@@ -9,7 +9,7 @@ namespace BlazorApp5.Data
 
         [Required(ErrorMessage = "Title is required")]
         [StringLength(64, MinimumLength = 3, ErrorMessage = "Title must be between 3 and 64 characters")]
-        [RegularExpression(@"^(?!^[0-9]+$)[^<>]+$", ErrorMessage = "Title cannot be a single number and cannot contain '<' or '>' characters")]
+        [RegularExpression(@"^[^\d]+$|^.*\d.*$", ErrorMessage = "Title cannot be a single number")]
         public string Title { get; set; }
 
         [Required(ErrorMessage = "Director is required")]
@@ -17,20 +17,23 @@ namespace BlazorApp5.Data
         [RegularExpression(@"^[^0-9]+$", ErrorMessage = "Director name cannot be a number")]
         public string Director { get; set; }
 
+
         [Required(ErrorMessage = "Description is required")]
         public string Description { get; set; }
 
         public string Image { get; set; }
 
+        [Required(ErrorMessage = "Language is required")]
+        [StringLength(32, ErrorMessage = "Language name must be less than 32 characters")]
+        [RegularExpression(@"^[^0-9]+$", ErrorMessage = "Language name cannot be a number")]
         public string Language { get; set; }
 
+        [Required]
         public int Status { get; set; } // Assuming validation for Status is handled elsewhere
+        
+        [Required]
 
         public int AgeId { get; set; }
-
-        [Required(ErrorMessage = "Age name is required")]
-        [RegularExpression(@"^\d+$", ErrorMessage = "Age name must be a number")]
-        public string AgeName { get; set; }
 
         public Movie()
         {
