@@ -4,14 +4,14 @@
 @using BlazorBootstrap
 @using System.Data
 
-<h3 class="mb-3">Edit Age: @age.Name</h3>
+<h3 class="mb-3">Edit Age</h3>
 
 <EditForm Model="age" OnValidSubmit="UpdateAge">
     <DataAnnotationsValidator />
     <div class="form-group row mb-3">
         <div class="col-md-10">
             <label for="Name" class="form-label">Name</label>
-            <InputNumber @bind-Value=age.Name class="form-control" min="3" max="20" />
+            <InputText @bind-Value=age.Name class="form-control" min="3" max="20" />
             <div class="text-danger">
                 <ValidationMessage For="() => age.Name" />
             </div>

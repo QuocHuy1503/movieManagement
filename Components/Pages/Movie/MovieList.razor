@@ -84,7 +84,9 @@ else
                     </GridColumn>
                     <GridColumn TItem="Movie" HeaderText="Action">
                         <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=@($"/movie/edit/{@context.Id}")>Edit</Button>
-                        <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteMovie(context.Id)">Delete</Button>
+                        @if(context.Status == 1){
+                            <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteMovie(context.Id)">Delete</Button>
+                        }
                     </GridColumn>
                 </Grid>
           </div>
@@ -184,7 +186,7 @@ else
             cmd.ExecuteNonQuery();
             conn.Close();
             movie.RemoveAll(m => m.Id == movieId); // Update local list for immediate UI update
-            NavigationManager.NavigateTo("/movie/list");
+            NavigationManager.NavigateTo("/movie/list", forceLoad: true);
         }
         catch (Exception ex)
         {

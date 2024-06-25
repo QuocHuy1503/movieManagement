@@ -49,6 +49,18 @@
       "PackagePath": "staticwebassets\\uploads\\Ideas_Surprised_Pikachu_HD.jpg"
     },
     {
+      "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg",
+      "PackagePath": "staticwebassets\\uploads\\MV5BMTMxNTMwODM0NF5BMl5BanBnXkFtZTcwODAyMTk2Mw@@._V1_.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg",
+      "PackagePath": "staticwebassets\\uploads\\MV5BNGNhMDIzZTUtNTBlZi00MTRlLWFjM2ItYzViMjE3YzI5MjljXkEyXkFqcGdeQXVyNzkwMjQ5NzM@._V1_.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\Oracle_Logo.jpg",
+      "PackagePath": "staticwebassets\\uploads\\Oracle_Logo.jpg"
+    },
+    {
       "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\Three-Layer-Architecture-763x1024.png",
       "PackagePath": "staticwebassets\\uploads\\Three-Layer-Architecture-763x1024.png"
     },
@@ -59,6 +71,14 @@
     {
       "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\images.png",
       "PackagePath": "staticwebassets\\uploads\\images.png"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\p15987_v_h8_au.jpg",
+      "PackagePath": "staticwebassets\\uploads\\p15987_v_h8_au.jpg"
+    },
+    {
+      "Id": "C:\\Users\\ADMIN\\source\\repos\\BlazorApp5\\wwwroot\\uploads\\p7825626_p_v8_ae.jpg",
+      "PackagePath": "staticwebassets\\uploads\\p7825626_p_v8_ae.jpg"
     },
     {
       "Id": "obj\\Debug\\net8.0\\staticwebassets\\msbuild.BlazorApp5.Microsoft.AspNetCore.StaticWebAssets.props",

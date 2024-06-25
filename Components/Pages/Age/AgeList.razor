@@ -37,7 +37,7 @@ else
                     </GridColumn>
                        <GridColumn TItem="Age" HeaderText="Action">
                         <Button Type="ButtonType.Link" Color="ButtonColor.Warning" Class="me-1" To=@($"/age/edit/{@context.Id}")>Edit</Button>
-                        <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteAge(context.Id)">Delete</Button>
+                       @*  <Button Type="ButtonType.Button" Color="ButtonColor.Danger" @onclick="(movieId) => DeleteAge(context.Id)">Delete</Button> *@
                   </GridColumn> 
 
                 </Grid>
@@ -101,7 +101,7 @@ else
             cmd.ExecuteNonQuery();
             conn.Close();
             Age.RemoveAll(m => m.Id == AgeId); // Update local list for immediate UI update
-            NavigationManager.NavigateTo("/Ages/list");
+            NavigationManager.NavigateTo("/age/list",forceLoad:true);
         }
         catch (Exception ex)
         {

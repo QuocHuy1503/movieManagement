@@ -1,7 +1,26 @@
 ﻿@page "/"
 
 <PageTitle>Home</PageTitle>
+<div class="d-flex flex-row justify-content-around">
+    <Card Style="width:18rem;">
+        <CardBody>
+            <CardTitle>Top 5 phim thịnh hành</CardTitle>
+            @*         <CardSubTitle Class="mb-2 text-muted">Card subtitle</CardSubTitle> *@
+            <CardText> Inception </CardText>
+            <CardText> The Shawshank Redemption</CardText>
+            <CardText> Pulp Fiction </CardText>
+            <CardText> The Dark Knight </CardText>
+            <Button Color="ButtonColor.Primary" To="#" Type="ButtonType.Link">Tạo thêm đợt chiếu mới</Button>
+            @*<CardLink To="#">Another link</CardLink> *@
+        </CardBody>
+    </Card>
+    <Card Style="width:18rem;">
+        <CardBody>
+            <CardTitle>Những khung giờ mà được đặt nhiều nhất</CardTitle>
+            <CardText> 17h-18h </CardText>
+            <CardText> 13h-15h </CardText>
+            <CardText> 8h-10h </CardText>
+        </CardBody>
+    </Card>
+</div>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
